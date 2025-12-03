@@ -1,3 +1,8 @@
+import java.util.Properties
+import java.io.FileInputStream
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -8,9 +13,9 @@ plugins {
 android {
     // Load local keystore properties if present (android/key.properties)
     val keystorePropertiesFile = rootProject.file("key.properties")
-    val keystoreProperties = java.util.Properties()
+    val keystoreProperties = Properties()
     if (keystorePropertiesFile.exists()) {
-        keystoreProperties.load(java.io.FileInputStream(keystorePropertiesFile))
+        keystoreProperties.load(FileInputStream(keystorePropertiesFile))
     }
     namespace = "com.example.hello_app"
     compileSdk = flutter.compileSdkVersion
@@ -21,9 +26,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
-    }
+    // Kotlin jvmTarget should be configured using tasks.withType<KotlinCompile>()
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
@@ -52,6 +55,9 @@ android {
         release {
             // use release signing if key.properties exists, otherwise fall back to debug
             signingConfig = if (keystorePropertiesFile.exists()) signingConfigs.getByName("release") else signingConfigs.getByName("debug")
+            // Resource shrinking requires code shrinking (minification) to be enabled.
+            // Keep resource shrinking off unless you enable minification and ProGuard/R8 rules.
+            isShrinkResources = false
             isMinifyEnabled = false // change to true and add proguard rules if you enable minification
         }
     }
@@ -59,4 +65,12 @@ android {
 
 flutter {
     source = "../.."
+}
+
+// Configure Kotlin compile options for all Kotlin compile tasks (sets JVM target)
+tasks.withType<KotlinCompile>().configureEach {
+    // Configure the Kotlin compiler target using the modern compilerOptions DSL
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
+    }
 }
