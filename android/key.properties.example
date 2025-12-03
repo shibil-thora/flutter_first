@@ -1,0 +1,8 @@
+# Example Android keystore properties file.
+# Copy this file to android/key.properties and fill in the correct values.
+# Do NOT commit your real key.properties or keystore file into source control.
+
+storePassword=YOUR_STORE_PASSWORD
+keyPassword=YOUR_KEY_PASSWORD
+keyAlias=hello-key
+storeFile=/absolute/path/to/your/my-release-key.jks
